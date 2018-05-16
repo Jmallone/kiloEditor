@@ -27,9 +27,9 @@ int main(){
 	char c;
 	while(read(STDIN_FILENO, &c, 1) == 1 && c != 'q'){
 		if(iscntrl(c)){		//Verifica se 'e um char printavel
-			printf("%d\n", c);
+			printf("%d \r \n", c);
 		}else{
-			printf("%d ('%c')\n", c, c);
+			printf("%d ('%c') \r \n", c, c);
 		}	
 	} //STDIN_FILENO LE O TECLADO
 	return 0; 
