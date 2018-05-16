@@ -15,8 +15,9 @@ void enableRawMode(){
 	atexit(disableRawMode);
 
 	struct termios raw = orig_termios; //Cria uma Struct do Tipo termios
-	raw.c_lflag &= ~(IXON); //Desabilita o CTRL S, CTRL Q
-	raw.c_lflag &= ~(ECHO | ICANON | ISIG); //Habilito o ECOAMENTO, Desativar o modo Canonio, Desativar as teclas CTRL Z - CTRL_C
+	raw.c_iflag &= ~(ICRNL | IXON); //Arruma o CTRL+M , Desabilita o CTRL S, CTRL Q
+	raw.c_oflag &= ~(OPOST);
+	raw.c_lflag &= ~(ECHO | ICANON | IEXTEN | ISIG); //Habilito o ECOAMENTO, Desativar o modo Canonio,Desativa o CTRL V,  Desativar as teclas CTRL Z - CTRL_C
 	tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw); //Mostro isso no terminal	
 }
 
