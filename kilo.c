@@ -1,5 +1,9 @@
 /*** includes ***/
 
+#define _DEFAULT_SOURCE
+#define _BSD_SOURCE
+#define _GNU_SOURCE
+
 #include <ctype.h>
 #include <errno.h>
 #include <stdio.h>
@@ -40,7 +44,7 @@ struct editorConfig{
 	int screenrows;
 	int screencols;
 	int numrows;
-	erow row;
+	erow *row;
 	struct termios orig_termios; 
 };
 
@@ -212,7 +216,7 @@ void editorDrawRows(struct abuf *ab){
 	int y;
 	for( y = 0; y < E.screenrows; y++){
 		if(y >= E.numrows){
-			if( y == E.screenrows / 3){
+			if(E.numrows == 0 && y == E.screenrows / 3){
 				char welcome[80];
 				int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
 			if(welcomelen > E.screencols) welcomelen = E.screencols;
@@ -329,7 +333,8 @@ void initEditor(){
 	E.cx = 0;
 	E.cy = 0;
 	E.numrows = 0;
-
+	E.row = NULL;
+	
 	if(getWindowSize(&E.screenrows, &E.screencols) == -1) die("getWindowSize");
 }
 
