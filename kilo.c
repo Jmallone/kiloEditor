@@ -33,11 +33,11 @@ enum editorKey{
 };
 
 /*** data ***/
+
 typedef struct erow{
 	int size;
 	char *chars;
 }erow;
-
 
 struct editorConfig{
 	int cx, cy;
@@ -51,6 +51,21 @@ struct editorConfig{
 };
 
 struct editorConfig E;
+
+/*** DEBUG ***/
+
+void debugLog(){
+	FILE *ponteiro;
+
+	ponteiro = fopen ("log.txt", "a");
+
+	int x = E.cx;
+	int y = E.cy;
+
+	fprintf(ponteiro, "X: %d | Y: %d\n", x, y );
+	fclose(ponteiro);
+
+}
 
 /*** terminal ***/
 
@@ -109,8 +124,6 @@ int editorReadKey(){
 						case '8': return END_KEY;
 					}
 				}
-			
-
 		}else{
 			switch (seq[1]){
 				case 'A': return ARROW_UP;
@@ -125,13 +138,11 @@ int editorReadKey(){
 		switch(seq[1]){
 			case 'H': return HOME_KEY;
 			case 'F': return END_KEY;
-
 		}
-	}
+	}		
 		
 		return '\x1b';
 	}else{
-
 		return c;
 	}
 }
@@ -160,7 +171,7 @@ int getWindowSize(int *rows, int *cols ){
 
 	if(ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws) == -1 || ws.ws_col == 0){
 		if(write(STDOUT_FILENO, "\x1b[999C\x1b[999B", 12) != 12) return -1;
-	return getCursorPosition(rows, cols);
+		return getCursorPosition(rows, cols);
 	}else{
 		*cols = ws.ws_col;
 		*rows = ws.ws_row;
@@ -170,9 +181,9 @@ int getWindowSize(int *rows, int *cols ){
 
 /*** row operations ***/
 
-void editorAppendRow(char *s, size_t len){
-	E.row = realloc(E.row, sizeof(erow)*(E.numrows + 1));
-	
+void editorAppendRow(char *s, size_t len) {
+	E.row = realloc(E.row, sizeof(erow) * (E.numrows + 1));
+
 	int at = E.numrows;
 	E.row[at].size = len;
 	E.row[at].chars = malloc(len + 1);
@@ -180,7 +191,6 @@ void editorAppendRow(char *s, size_t len){
 	E.row[at].chars[len] = '\0';
 	E.numrows++;
 }
-
 
 /*** file i/o ***/
 
@@ -190,9 +200,11 @@ void editorOpen(char *filename){
 	
 	char *line = NULL;
 	size_t linecap = 0;
-	ssize_t linelen;
+	ssize_t linelen; 	
 	while((linelen = getline(&line, &linecap, fp)) != -1){
 		while(linelen > 0 && (line[linelen - 1] == '\n' || line[linelen - 1] == '\r' )) linelen--;
+		
+		
 		editorAppendRow(line, linelen);
 	}
 	free(line);
@@ -246,6 +258,7 @@ void editorDrawRows(struct abuf *ab){
 			if(E.numrows == 0 && y == E.screenrows / 3){
 				char welcome[80];
 				int welcomelen = snprintf(welcome, sizeof(welcome), "Kilo editor -- version %s", KILO_VERSION);
+			
 			if(welcomelen > E.screencols) welcomelen = E.screencols;
 		
 			int padding = (E.screencols - welcomelen) / 2;
@@ -262,7 +275,7 @@ void editorDrawRows(struct abuf *ab){
 			int len = E.row[filerow].size - E.coloff;
 			if(len < 0) len = 0;
 			if( len > E.screencols) len = E.screencols;
-			abAppend(ab, E.row[filerow].chars[E.coloff], len);
+			abAppend(ab, &E.row[filerow].chars[E.coloff], len);
 		}
 		abAppend(ab, "\x1b[K", 3);
 		if(y < E.screenrows - 1){
@@ -282,10 +295,10 @@ void editorRefreshScreen(){
 	editorDrawRows(&ab);
 	
 	char buf[32];
-	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, E.cx + 1);
+	snprintf(buf, sizeof(buf), "\x1b[%d;%dH", (E.cy - E.rowoff) + 1, (E.cx - E.coloff) + 1);
+	
 	abAppend(&ab, buf, strlen(buf));
 
-	//abAppend(&ab, "\x1b[H", 3);
 	abAppend(&ab, "\x1b[?25h", 6);
 	
 	write(STDOUT_FILENO, ab.b, ab.len);
@@ -295,19 +308,21 @@ void editorRefreshScreen(){
 /*** input ***/
 
 void editorMoveCursor(int key){
+	erow *row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+
 	switch(key){
 		case ARROW_LEFT:
-			if(E.cx != 0){
+			if(E.cx != 0){ 
 				E.cx--;
 			}
 			break;
 		case ARROW_RIGHT:
-			if(E.cx != E.screencols - 1){
+			if(row && E.cx < row->size){
 				E.cx++;
 			}
 			break;
 		case ARROW_UP:
-			if(E.cx != 0){
+			if(E.cy != 0){
 				E.cy--;
 			}
 			break;
@@ -315,8 +330,7 @@ void editorMoveCursor(int key){
 			if(E.cy < E.numrows){
 				E.cy++;
 			}
-			break;
-			
+			break;		
 	}
 }
 
@@ -338,7 +352,6 @@ void editorProcessKeypress(){
 			E.cx = E.screencols - 1;
 			break;
 
-	
 		case PAGE_UP:
 		case PAGE_DOWN:
 			{
@@ -380,6 +393,7 @@ int main(int argc, char *argv[]){
 	while(1){
 		editorRefreshScreen();
 		editorProcessKeypress();
+		debugLog();
 	}
 
 	return 0; 
