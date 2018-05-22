@@ -36,7 +36,9 @@ enum editorKey {
 
 typedef struct erow {
   int size;
+  int rsize;
   char *chars;
+  char *render;
 } erow;
 
 struct editorConfig {
@@ -63,7 +65,7 @@ void debugLog(){
 
 	strcpy(string, E.row[0].chars); 
 
-	fprintf(ponteiro, "+-----------+\n|X: %d | Y: %d|\n|RowOff:   %d|\n|ColOff:   %d|\n|ScrRow:  %d|\n|ScrCols: %d|\n|NumRow: %d|\n+-----------+\n\n 1: %s", E.cx, E.cy, E.rowoff, E.coloff, E.screenrows, E.screencols, E.numrows, string);
+	fprintf(ponteiro, "+-----------+\n|X: %d | Y: %d|\n|RowOff:   %d|\n|ColOff:   %d|\n|ScrRow:  %d|\n|ScrCols: %d|\n|NumRow: %d|\n+-----------+\n\n 1: %s\n", E.cx, E.cy, E.rowoff, E.coloff, E.screenrows, E.screencols, E.numrows, string);
 	fclose(ponteiro);
 
 }
@@ -190,6 +192,10 @@ void editorAppendRow(char *s, size_t len) {
   E.row[at].chars = malloc(len + 1);
   memcpy(E.row[at].chars, s, len);
   E.row[at].chars[len] = '\0';
+
+  E.row[at].rsize = 0;
+  E.row[at].render = NULL;
+
   E.numrows++;
 }
 
@@ -315,12 +321,18 @@ void editorMoveCursor(int key) {
     case ARROW_LEFT:
       if (E.cx != 0) {
         E.cx--;
-      }
+      }else if (E.cy > 0){
+		E.cy--;
+		E.cx = E.row[E.cy].size;
+	}
       break;
     case ARROW_RIGHT:
       if (row && E.cx < row->size) {
         E.cx++;
-      }
+      }else if(row && E.cx == row->size){
+		E.cy++;
+		E.cx = 0;
+	}
       break;
     case ARROW_UP:
       if (E.cy != 0) {
@@ -333,6 +345,11 @@ void editorMoveCursor(int key) {
       }
       break;
   }
+	row = (E.cy >= E.numrows) ? NULL : &E.row[E.cy];
+	int rowlen = row ? row->size : 0;
+	if (E.cx > rowlen){
+		E.cx = rowlen;
+	}		
 }
 
 void editorProcessKeypress() {
