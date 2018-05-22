@@ -20,16 +20,16 @@
 
 #define CTRL_KEY(k) ((k) & 0x1f)
 
-enum editorKey{
-	ARROW_LEFT = 1000,
-	ARROW_RIGHT,
-	ARROW_UP,
-	ARROW_DOWN,
-	DEL_KEY,
-	HOME_KEY,
-	END_KEY,
-	PAGE_UP,
-	PAGE_DOWN
+enum editorKey {
+  ARROW_LEFT = 1000,
+  ARROW_RIGHT,
+  ARROW_UP,
+  ARROW_DOWN,
+  DEL_KEY,
+  HOME_KEY,
+  END_KEY,
+  PAGE_UP,
+  PAGE_DOWN
 };
 
 /*** data ***/
@@ -37,7 +37,7 @@ enum editorKey{
 typedef struct erow{
 	int size; 
 	char *chars;
-}erow;
+} erow;
 
 struct editorConfig{
 	int cx, cy;
@@ -63,7 +63,7 @@ void debugLog(){
 
 	strcpy(string, E.row[0].chars); 
 
-	fprintf(ponteiro, "+-----------+\n|X: %d | Y: %d|\n|RowOff:   %d|\n|ColOff:   %d|\n|ScrRow:  %d|\n|ScrCols: %d|\n|NumRow: %d|\n+-----------+\n\n 1Linha: %s", E.cx, E.cy, E.rowoff, E.coloff, E.screenrows, E.screencols, E.numrows, string);
+	fprintf(ponteiro, "+-----------+\n|X: %d | Y: %d|\n|RowOff:   %d|\n|ColOff:   %d|\n|ScrRow:  %d|\n|ScrCols: %d|\n|NumRow: %d|\n+-----------+\n\n 1: %s", E.cx, E.cy, E.rowoff, E.coloff, E.screenrows, E.screencols, E.numrows, string);
 	fclose(ponteiro);
 
 }
