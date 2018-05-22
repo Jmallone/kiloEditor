@@ -35,7 +35,7 @@ enum editorKey{
 /*** data ***/
 
 typedef struct erow{
-	int size;
+	int size; 
 	char *chars;
 }erow;
 
@@ -57,12 +57,13 @@ struct editorConfig E;
 void debugLog(){
 	FILE *ponteiro;
 
-	ponteiro = fopen ("log.txt", "a");
+	ponteiro = fopen ("log.txt", "w");
 
-	int x = E.cx;
-	int y = E.cy;
+	char string[100];
 
-	fprintf(ponteiro, "X: %d | Y: %d\n", x, y );
+	strcpy(string, E.row[0].chars); 
+
+	fprintf(ponteiro, "+-----------+\n|X: %d | Y: %d|\n|RowOff:   %d|\n|ColOff:   %d|\n|ScrRow:  %d|\n|ScrCols: %d|\n|NumRow: %d|\n+-----------+\n\n 1Linha: %s", E.cx, E.cy, E.rowoff, E.coloff, E.screenrows, E.screencols, E.numrows, string);
 	fclose(ponteiro);
 
 }
