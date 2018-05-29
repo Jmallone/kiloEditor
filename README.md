@@ -4,7 +4,8 @@ Editor de texto baseado em C
 
 Pegando referencia o texto: [Build Your Own Text Editor](https://viewsourcecode.org/snaptoken/kilo/)
 
-#Como executar
+
+# Como executar
 	
 	Kilo Editor
 	- gcc kilo.c -o kilo
@@ -14,7 +15,7 @@ Pegando referencia o texto: [Build Your Own Text Editor](https://viewsourcecode.
 	- gcc debug.c -o debug
 	-./debug
 
-#Comandos
+# Comandos
 	
 	CTRL+Q = Sair
 	CTRL+S = Salvar
